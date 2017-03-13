@@ -1,4 +1,4 @@
 # LoginTempl
-- Facebook Login
+- Facebook SDK
 - intergrated with Alamofire
-
+- 
