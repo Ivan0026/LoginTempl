@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 import Alamofire
 
-let URL_Login:String = "https://httpbin.org/get"
-let URL_Signup:String = "https://httpbin.org/get"
+let URL_Login:String = "https://here.url/get"
+let URL_Signup:String = "https://here.url/post"
 
 
 public typealias CompletionHandler = ((Any?, Error?) -> Void)
