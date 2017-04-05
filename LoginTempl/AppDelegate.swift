@@ -11,9 +11,18 @@ import CoreData
 
 import FBSDKCoreKit
 import FBSDKLoginKit
+import Google
+import GoogleSignIn
+
+var loggedInUser = User()
+
+//let NOTIFY_GoogleLoggedIn: String = "NotificationGoogleLoggedIn"
+extension Notification.Name {
+    static let NOTIFY_GoogleLoggedIn = Notification.Name("NotificationGoogleLoggedIn")
+}
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
 
     var window: UIWindow?
 
@@ -21,21 +30,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
+        //For Google Signin
+        var configureError: NSError?
+        GGLContext.sharedInstance().configureWithError(&configureError)
+        assert(configureError == nil, "Error configuring Google services: \(configureError)")
+        GIDSignIn.sharedInstance().delegate = self
+        
+        //For Facebook Signin
         return FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         
 //        return true
     }
     
-    func application(_ application: UIApplication,
-                     open url: URL,
-                     sourceApplication: String?,
-                     annotation: Any) -> Bool {
-        return FBSDKApplicationDelegate.sharedInstance().application(
-            application,
-            open: url as URL!,
-            sourceApplication: sourceApplication,
-            annotation: annotation)
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        
+        GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication, annotation: annotation)
+        
+        return FBSDKApplicationDelegate.sharedInstance().application(application, open: url as URL!, sourceApplication: sourceApplication, annotation: annotation)
     }
+    
+//    func application(application: UIApplication, openURL url: NSURL, options: [String: AnyObject]) -> Bool {
+//        return GIDSignIn.sharedInstance().handle(url as URL!,
+//                                                    sourceApplication: options[UIApplicationOpenURLOptionsKey.sourceApplication.rawValue] as? String,
+//                                                    annotation: options[UIApplicationOpenURLOptionsKey.annotation.rawValue])
+//    }
+    
+    // GIDSignInDelegate
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if (error == nil) {
+            // Perform any operations on signed in user here.
+            loggedInUser.userId = user.userID
+            loggedInUser.idToken = user.authentication.idToken
+            loggedInUser.fullName = user.profile.name
+            loggedInUser.givenName = user.profile.givenName
+            loggedInUser.familyName = user.profile.familyName
+            loggedInUser.email = user.profile.email
+            // ...
+            
+            NotificationCenter.default.post(name: .NOTIFY_GoogleLoggedIn, object: nil)
+            
+        } else {
+            print("\(error.localizedDescription)")
+        }
+    }
+    
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

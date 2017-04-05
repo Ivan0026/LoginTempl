@@ -35,7 +35,7 @@ class LoginViewController: UIViewController {
         
         logInWith(userName: textFieldUserName.text as NSString!, passWord: textFieldPassword.text as NSString!) { (result, error) in
             
-            print("JSON: \(result)")
+            print("JSON: \(result ?? "Result: Null")")
             
             if error == nil {
                 self.openMainPage()

@@ -28,6 +28,9 @@ public func logInWith( userName:NSString!,
             
             completion(json, nil)
             
+        } else {
+            
+            completion(nil, nil)
         }
     }
     

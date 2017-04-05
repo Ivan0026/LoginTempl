@@ -8,8 +8,14 @@
 
 import UIKit
 import FacebookLogin
+import GoogleSignIn
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, GIDSignInUIDelegate {
+    
+//    @IBOutlet weak var gidSignInButton: GIDSignInButton!
+    @IBOutlet weak var gidSignInButton: UIButton!
+    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,8 +25,36 @@ class ViewController: UIViewController {
 //        loginButton.center = view.center
 //        view.addSubview(loginButton)
         
+        GIDSignIn.sharedInstance().uiDelegate = self
         
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNotification), name: .NOTIFY_GoogleLoggedIn, object: nil)
         
+
+    }
+    
+    func handleNotification() {
+        self.openMainPage()
+    }
+    
+    func sign(inWillDispatch signIn: GIDSignIn!, error: Error!) {
+        activityIndicator.stopAnimating()
+    }
+    
+    // Present a view that prompts the user to sign in with Google
+    func sign(_ signIn: GIDSignIn!, present viewController: UIViewController!) {
+        self.present(viewController, animated: true, completion: nil)
+    }
+    
+    // Dismiss the "Sign in with Google" view
+    func sign(_ signIn: GIDSignIn!, dismiss viewController: UIViewController!) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func gidSigninButtonClicked() {
+        
+        activityIndicator.startAnimating()
+        
+        GIDSignIn.sharedInstance().signIn()
     }
     
     @IBAction func fbloginButtonClicked() {
@@ -52,6 +86,7 @@ class ViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = true
+//        GIDSignIn.sharedInstance().signOut()
     }
     
     override func didReceiveMemoryWarning() {

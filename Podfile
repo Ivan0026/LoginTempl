@@ -8,4 +8,6 @@ target ‘LoginTempl' do
   pod 'FacebookCore'
   pod 'FacebookLogin'
   pod 'FacebookShare'
+  pod 'Google/SignIn'
+  pod 'Firebase/Auth'
 end
